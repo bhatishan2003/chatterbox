@@ -78,7 +78,7 @@ cd chatterbox
 - Open two more terminals and run the client and connect to the server (default: `127.0.0.1:9009`):
 
   ```bash
-  python -m chatterbox.client
+  chatterbox --client
   ```
 
 ## Testing
