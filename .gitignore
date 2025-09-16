@@ -173,5 +173,3 @@ cython_debug/
 results/
 mlruns
 wandb
-
-.json
