@@ -2,6 +2,9 @@
 
 A simple socket-based chat app with login, broadcast, and private messaging.
 
+[![Python Versions](https://img.shields.io/pypi/pyversions/chatterbox.svg)](https://pypi.org/project/chatterbox/)
+[![License](https://img.shields.io/github/license/bhatishan2003/chatterbox)](LICENSE)
+
 ## Table of Contents <!-- omit in toc -->
 
 - [Installation](#installation)
@@ -9,6 +12,7 @@ A simple socket-based chat app with login, broadcast, and private messaging.
 - [Usage](#usage)
   - [1. Start the Server](#1-start-the-server)
   - [2. Start the Client](#2-start-the-client)
+- [Testing](#testing)
 
 ## Installation
 
@@ -17,7 +21,7 @@ A simple socket-based chat app with login, broadcast, and private messaging.
    Run the following command to create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
    ```bash
-   python3 -m venv .venv
+   python -m venv .venv
    ```
 
    - **Activate:**
@@ -75,3 +79,11 @@ cd chatterbox
   ```bash
   python -m chatterbox.client
   ```
+
+## Testing
+
+Run all tests:
+
+```bash
+pytest -v
+```
