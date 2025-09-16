@@ -1,0 +1,18 @@
+# .coveragerc
+[run]
+branch = True
+source =
+    asciigen
+
+[report]
+show_missing = True
+skip_covered = True
+omit =
+    setup.py
+    tests/*
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml
