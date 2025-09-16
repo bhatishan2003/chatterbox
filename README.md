@@ -4,6 +4,7 @@ A simple socket-based chat app with login, broadcast, and private messaging.
 
 ![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
 [![License](https://img.shields.io/github/license/bhatishan2003/chatterbox)](LICENSE)
+[![Python CI](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml/badge.svg)](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml)
 
 ## Table of Contents <!-- omit in toc -->
 
