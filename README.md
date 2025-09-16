@@ -2,7 +2,7 @@
 
 A simple socket-based chat app with login, broadcast, and private messaging.
 
-[![Python Versions](https://img.shields.io/pypi/pyversions/chatterbox.svg)](https://pypi.org/project/chatterbox/)
+![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
 [![License](https://img.shields.io/github/license/bhatishan2003/chatterbox)](LICENSE)
 
 ## Table of Contents <!-- omit in toc -->
