@@ -1,90 +1,104 @@
-# Chatterbox <!-- omit in toc -->
-
-A simple socket-based chat app with register/login and private messaging.
+# Chatterbox
 
 ![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
 [![License](https://img.shields.io/github/license/bhatishan2003/chatterbox)](LICENSE)
 [![Python CI](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml/badge.svg)](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml)
 
-## Table of Contents <!-- omit in toc -->
+A simple, terminal-based chat application with user authentication and private messaging, built with Python sockets.
 
-- [Installation](#installation)
-  - [Clone the repository:](#clone-the-repository)
-- [Usage](#usage)
-  - [1. Start the Server](#1-start-the-server)
-  - [2. Start the Client](#2-start-the-client)
-- [Testing](#testing)
+## Features
 
-## Installation
+*   **User Authentication:** Secure registration and login system.
+*   **Password Hashing:** Passwords are securely hashed using PBKDF2.
+*   **Public Chat:** Broadcast messages to all connected users.
+*   **Private Messaging:** Send private messages to specific users.
+*   **User List:** View a list of all online users.
+*   **Multi-client Support:** The server uses threading to handle multiple clients concurrently.
 
-1. **Create a Virtual Environment [Optional, but recommended]**
+## Getting Started
 
-   Run the following command to create a [virtual environment](https://docs.python.org/3/library/venv.html):
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-   ```bash
-   python -m venv .venv
-   ```
+### Prerequisites
 
-   - **Activate:**
+*   Python 3.11 or higher
 
-     - **Windows (PowerShell):**
+### Installation
 
-     ```bash
-     .venv\Scripts\activate
-     ```
+1.  **Clone the repository:**
 
-     - **Linux/Mac (Bash):**
+    ```bash
+    git clone https://github.com/bhatishan2003/chatterbox.git
+    cd chatterbox
+    ```
 
-     ```bash
-     source .venv/bin/activate
-     ```
+2.  **Create and activate a virtual environment (recommended):**
 
-   - **Deactivate:**
-     ```bash
-     deactivate
-     ```
+    *   **Windows:**
+        ```bash
+        python -m venv .venv
+        .venv\Scripts\activate
+        ```
 
-### Clone the repository:
+    *   **macOS & Linux:**
+        ```bash
+        python -m venv .venv
+        source .venv/bin/activate
+        ```
 
-```bash
-git clone https://github.com/bhatishan2003/chatterbox.git
-cd chatterbox
-```
+3.  **Install the package:**
 
-- Install the package:
+    *   For regular use:
+        ```bash
+        pip install .
+        ```
 
-  ```bash
-  pip install .
-  ```
-
-- For development (editable mode):
-
-  ```bash
-  pip install -e .
-  ```
+    *   For development (editable mode):
+        ```bash
+        pip install -e .
+        ```
 
 ## Usage
 
 ### 1. Start the Server
 
-- Open first terminal run the server on the default port (`9009`) :
+Open a terminal and run the following command to start the chat server on the default host (`127.0.0.1`) and port (`9009`):
 
-  ```bash
-  chatterbox --server
-  ```
+```bash
+chatterbox --server
+```
 
 ### 2. Start the Client
 
-- Open two more terminals and run the client and connect to the server (default: `127.0.0.1:9009`):
+Open one or more new terminals and run the following command to connect a client to the server:
 
-  ```bash
-  chatterbox --client
-  ```
+```bash
+chatterbox --client
+```
+
+## Commands
+
+The client supports the following commands:
+
+| Command                | Description                  |
+| ---------------------- | ---------------------------- |
+| `/msg <user> <message>`| Send a private message.      |
+| `/list`                | List all online users.       |
+| `/help`                | Show this help message.      |
+| `/quit`                | Disconnect from the server.  |
 
 ## Testing
 
-Run all tests:
+To run the test suite, execute the following command:
 
 ```bash
 pytest -v
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
