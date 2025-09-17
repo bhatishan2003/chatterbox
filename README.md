@@ -67,7 +67,7 @@ cd chatterbox
 
 ### 1. Start the Server
 
-- Open first termina run the server on the default port (`9009`) :
+- Open first terminal run the server on the default port (`9009`) :
 
   ```bash
   chatterbox --server
