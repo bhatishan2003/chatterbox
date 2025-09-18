@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>chatterbox &#8212; chatterbox 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=34905f61" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="chatterbox package" href="chatterbox.html" />
+    <link rel="prev" title="Testing" href="test.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chatterbox.html" title="chatterbox package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="test.html" title="Testing"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">chatterbox</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="chatterbox">
+<h1>chatterbox<a class="headerlink" href="#chatterbox" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chatterbox.html">chatterbox package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chatterbox.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chatterbox.html#module-chatterbox.cli">chatterbox.cli module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chatterbox.html#module-chatterbox.client">chatterbox.client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.client.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.client.print_help"><code class="docutils literal notranslate"><span class="pre">print_help()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.client.receiver_thread"><code class="docutils literal notranslate"><span class="pre">receiver_thread()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.client.recv_json"><code class="docutils literal notranslate"><span class="pre">recv_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.client.send_json"><code class="docutils literal notranslate"><span class="pre">send_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chatterbox.html#module-chatterbox.server">chatterbox.server module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.broadcast"><code class="docutils literal notranslate"><span class="pre">broadcast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.handle_client"><code class="docutils literal notranslate"><span class="pre">handle_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.hash_password"><code class="docutils literal notranslate"><span class="pre">hash_password()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.load_users"><code class="docutils literal notranslate"><span class="pre">load_users()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.recv_json"><code class="docutils literal notranslate"><span class="pre">recv_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.remove_client"><code class="docutils literal notranslate"><span class="pre">remove_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.save_users"><code class="docutils literal notranslate"><span class="pre">save_users()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.send_json"><code class="docutils literal notranslate"><span class="pre">send_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.send_private"><code class="docutils literal notranslate"><span class="pre">send_private()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.send_system"><code class="docutils literal notranslate"><span class="pre">send_system()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.start_server"><code class="docutils literal notranslate"><span class="pre">start_server()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="chatterbox.html#chatterbox.server.verify_password"><code class="docutils literal notranslate"><span class="pre">verify_password()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chatterbox.html#module-chatterbox">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="test.html"
+                          title="previous chapter">Testing</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="chatterbox.html"
+                          title="next chapter">chatterbox package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chatterbox.html" title="chatterbox package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="test.html" title="Testing"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">chatterbox</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Ishan Bhat.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

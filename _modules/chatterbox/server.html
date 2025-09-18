@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chatterbox.server &#8212; chatterbox 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=34905f61" />
+    <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">chatterbox.server</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chatterbox.server</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">server.py</span>
+
+<span class="sd">Run: python server.py</span>
+
+<span class="sd">Multi-client chat server with user authentication.</span>
+<span class="sd">Users stored in users.json with PBKDF2 password hashing.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="n">HOST</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span>
+<span class="n">PORT</span> <span class="o">=</span> <span class="mi">9009</span>
+<span class="n">USERS_FILE</span> <span class="o">=</span> <span class="s2">&quot;users.json&quot;</span>
+
+<span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+<span class="n">clients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">addresses</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="c1"># ---------------- User store helpers ----------------</span>
+<div class="viewcode-block" id="load_users">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.load_users">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_users</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the user database from a JSON file.</span>
+
+<span class="sd">    If the user file does not exist, it returns an empty dictionary.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing user data, with usernames as keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="save_users">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.save_users">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_users</span><span class="p">(</span><span class="n">users</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the user database to a JSON file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        users (dict): A dictionary containing user data to be saved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="hash_password">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.hash_password">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hashes a password using PBKDF2-HMAC-SHA256.</span>
+
+<span class="sd">    If a salt is not provided, a new 16-byte salt is generated. The function</span>
+<span class="sd">    uses 200,000 iterations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        password (str): The password to hash.</span>
+<span class="sd">        salt (str, optional): The salt to use, as a hex string. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[str, str]: A tuple containing the salt (hex) and the derived key (hex).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">salt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">salt</span> <span class="o">=</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_hex</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">dk</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">pbkdf2_hmac</span><span class="p">(</span><span class="s2">&quot;sha256&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">salt</span><span class="p">),</span> <span class="mi">200_000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">salt</span><span class="p">,</span> <span class="n">dk</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="verify_password">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.verify_password">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_password</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stored_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verifies a password against a stored salt and hash.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        password (str): The password to verify.</span>
+<span class="sd">        salt (str): The salt used during hashing (hex).</span>
+<span class="sd">        stored_hash (str): The stored password hash to compare against (hex).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the password is correct, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dk</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">pbkdf2_hmac</span><span class="p">(</span><span class="s2">&quot;sha256&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">salt</span><span class="p">),</span> <span class="mi">200_000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dk</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="o">==</span> <span class="n">stored_hash</span></div>
+
+
+
+<span class="c1"># ---------------- Socket JSON helpers ----------------</span>
+<div class="viewcode-block" id="send_json">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serialize and send a JSON object over a socket with a length-prefixed header.</span>
+
+<span class="sd">    This function first encodes the given Python object as a compact JSON string,</span>
+<span class="sd">    then prefixes it with a 4-byte unsigned integer (big-endian) indicating the</span>
+<span class="sd">    length of the serialized data. Both the header and JSON payload are sent</span>
+<span class="sd">    using `socket.sendall` to ensure all bytes are transmitted.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conn (socket.socket): An active, connected socket object.</span>
+<span class="sd">        obj (Any): A JSON-serializable Python object (e.g., dict, list, str, int).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If `obj` cannot be serialized to JSON.</span>
+<span class="sd">        OSError: If the socket connection is broken during transmission.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="recv_json">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.recv_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">recv_json</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Receive and deserialize a length-prefixed JSON object from a socket.</span>
+
+<span class="sd">    This function reads a 4-byte header to determine the incoming payload size,</span>
+<span class="sd">    then reads that many bytes from the socket. The received bytes are decoded</span>
+<span class="sd">    and parsed as a JSON object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conn (socket.socket): An active, connected socket object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Any: The deserialized Python object, or None if the connection is</span>
+<span class="sd">             closed or an incomplete header is received.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        json.JSONDecodeError: If the received data is not valid JSON.</span>
+<span class="sd">        OSError: If the socket connection is broken during transmission.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;I&quot;</span><span class="p">,</span> <span class="n">header</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">chunks</span><span class="p">,</span> <span class="n">bytes_recd</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">bytes_recd</span> <span class="o">&lt;</span> <span class="n">total</span><span class="p">:</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">bytes_recd</span><span class="p">,</span> <span class="mi">4096</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">bytes_recd</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span></div>
+
+
+
+<span class="c1"># ---------------- Broadcast / Private send ----------------</span>
+<div class="viewcode-block" id="broadcast">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.broadcast">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span><span class="n">sender</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Broadcasts a message to all connected and authenticated clients.</span>
+
+<span class="sd">    If sending to a client fails, that client is removed from the pool.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sender (str): The username of the message sender (or &#39;SYS&#39; for system).</span>
+<span class="sd">        message (str): The message text to broadcast.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;broadcast&quot;</span><span class="p">,</span> <span class="s2">&quot;from&quot;</span><span class="p">:</span> <span class="n">sender</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+    <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">user</span><span class="p">,</span> <span class="n">sock</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">clients</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">send_json</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">remove_client</span><span class="p">(</span><span class="n">user</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="send_private">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_private">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_private</span><span class="p">(</span><span class="n">sender</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sends a private message to a single specified client.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sender (str): The username of the message sender.</span>
+<span class="sd">        target (str): The username of the recipient.</span>
+<span class="sd">        message (str): The message text to send.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the message was sent successfully, False if the target</span>
+<span class="sd">              user was not found or the connection failed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;private&quot;</span><span class="p">,</span> <span class="s2">&quot;from&quot;</span><span class="p">:</span> <span class="n">sender</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+    <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">clients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sock</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">send_json</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">remove_client</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="send_system">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_system">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sends a system message to a single client.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conn (socket.socket): The socket of the client to send the message to.</span>
+<span class="sd">        text (str): The system message text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="remove_client">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.remove_client">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_client</span><span class="p">(</span><span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes a client from the global client and address dictionaries and closes the socket.</span>
+
+<span class="sd">    This function is thread-safe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        username (str): The username of the client to remove.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">clients</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sock</span><span class="p">:</span>
+            <span class="n">addresses</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+
+
+<span class="c1"># ---------------- Per-client handler ----------------</span>
+<div class="viewcode-block" id="handle_client">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.handle_client">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_client</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles a single client connection from inception to termination.</span>
+
+<span class="sd">    This function manages the authentication process (register/login), then enters</span>
+<span class="sd">    a loop to receive and process messages and commands from the client. It</span>
+<span class="sd">    dispatches actions like broadcasting, private messaging, and user listing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conn (socket.socket): The client&#39;s socket object.</span>
+<span class="sd">        addr (tuple): The client&#39;s address tuple (host, port).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">load_users</span><span class="p">()</span>
+        <span class="n">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;WELCOME: send login/register request&quot;</span><span class="p">)</span>
+        <span class="n">auth</span> <span class="o">=</span> <span class="n">recv_json</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auth</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;action&quot;</span><span class="p">)</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">action</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">username</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">password</span><span class="p">:</span>
+            <span class="n">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;Invalid auth payload&quot;</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;register&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+                <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;username_taken&quot;</span><span class="p">})</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="n">salt</span><span class="p">,</span> <span class="n">phash</span> <span class="o">=</span> <span class="n">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+            <span class="n">users</span><span class="p">[</span><span class="n">username</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;salt&quot;</span><span class="p">:</span> <span class="n">salt</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">phash</span><span class="p">}</span>
+            <span class="n">save_users</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
+            <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;registered&quot;</span><span class="p">})</span>
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;login&quot;</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">info</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">verify_password</span><span class="p">(</span><span class="n">password</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;salt&quot;</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;hash&quot;</span><span class="p">]):</span>
+                <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid_credentials&quot;</span><span class="p">})</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;welcome&quot;</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;Unknown action&quot;</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">username</span> <span class="ow">in</span> <span class="n">clients</span><span class="p">:</span>
+                <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;already_logged_in&quot;</span><span class="p">})</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="n">clients</span><span class="p">[</span><span class="n">username</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn</span>
+            <span class="n">addresses</span><span class="p">[</span><span class="n">conn</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">addr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">addr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">broadcast</span><span class="p">(</span><span class="s2">&quot;SYS&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;--- </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> has joined the chat ---&quot;</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">recv_json</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">payload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">typ</span> <span class="o">==</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">broadcast</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">typ</span> <span class="o">==</span> <span class="s2">&quot;private&quot;</span><span class="p">:</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;to&quot;</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">ok</span> <span class="o">=</span> <span class="n">send_private</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                    <span class="n">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;user </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">typ</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
+                    <span class="n">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">clients</span><span class="o">.</span><span class="n">keys</span><span class="p">())})</span>
+            <span class="k">elif</span> <span class="n">typ</span> <span class="o">==</span> <span class="s2">&quot;quit&quot;</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;unknown_type&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Client error:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+            <span class="n">remove_client</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="n">broadcast</span><span class="p">(</span><span class="s2">&quot;SYS&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;--- </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2"> has left the chat ---&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+
+<span class="c1"># ---------------- Server main ----------------</span>
+<div class="viewcode-block" id="start_server">
+<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.start_server">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">start_server</span><span class="p">(</span><span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">HOST</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PORT</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Starts the main chat server and listens for incoming connections.</span>
+
+<span class="sd">    The server binds to a host and port, and for each new connection, it spawns</span>
+<span class="sd">    a new daemon thread running `handle_client` to manage that client</span>
+<span class="sd">    independently.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        host (str, optional): The host address to bind to. Defaults to HOST.</span>
+<span class="sd">        port (int, optional): The port to listen on. Defaults to PORT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Server listening on </span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">conn</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connection from&quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">handle_client</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">addr</span><span class="p">),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Server shutting down...&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">start_server</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">chatterbox.server</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Ishan Bhat.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>
