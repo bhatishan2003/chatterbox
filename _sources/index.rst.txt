@@ -1,12 +1,12 @@
-.. chatterbox documentation master file, created by
+.. chatterflow documentation master file, created by
    sphinx-quickstart on Wed Sep 17 15:21:20 2025.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Chatterbox's documentation!
-======================================
+Welcome to chatterflow's documentation!
+=======================================
 
-**Chatterbox** is a simple, terminal-based chat application with user authentication and private messaging, built with Python sockets.
+**chatterflow** is a simple, terminal-based chat application with user authentication and private messaging, built with Python sockets.
 
 Features
 --------
@@ -27,3 +27,4 @@ Features
    test
    modules
    api
+   chatterflow

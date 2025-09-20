@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>chatterbox.server &#8212; chatterbox 0.0.1 documentation</title>
+    <title>chatterflow.server &#8212; chatterflow 0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=34905f61" />
     <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -22,9 +22,9 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">chatterflow 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">chatterbox.server</a></li> 
+        <li class="nav-item nav-item-this"><a href="">chatterflow.server</a></li> 
       </ul>
     </div>  
 
@@ -33,7 +33,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for chatterbox.server</h1><div class="highlight"><pre>
+  <h1>Source code for chatterflow.server</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">server.py</span>
@@ -64,7 +64,7 @@
 
 <span class="c1"># ---------------- User store helpers ----------------</span>
 <div class="viewcode-block" id="load_users">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.load_users">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.load_users">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_users</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads the user database from a JSON file.</span>
@@ -82,7 +82,7 @@
 
 
 <div class="viewcode-block" id="save_users">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.save_users">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.save_users">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">save_users</span><span class="p">(</span><span class="n">users</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Saves the user database to a JSON file.</span>
@@ -96,7 +96,7 @@
 
 
 <div class="viewcode-block" id="hash_password">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.hash_password">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.hash_password">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hashes a password using PBKDF2-HMAC-SHA256.</span>
@@ -119,7 +119,7 @@
 
 
 <div class="viewcode-block" id="verify_password">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.verify_password">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.verify_password">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">verify_password</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stored_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Verifies a password against a stored salt and hash.</span>
@@ -139,7 +139,7 @@
 
 <span class="c1"># ---------------- Socket JSON helpers ----------------</span>
 <div class="viewcode-block" id="send_json">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_json">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.send_json">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">send_json</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serialize and send a JSON object over a socket with a length-prefixed header.</span>
@@ -164,7 +164,7 @@
 
 
 <div class="viewcode-block" id="recv_json">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.recv_json">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.recv_json">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">recv_json</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Receive and deserialize a length-prefixed JSON object from a socket.</span>
@@ -201,7 +201,7 @@
 
 <span class="c1"># ---------------- Broadcast / Private send ----------------</span>
 <div class="viewcode-block" id="broadcast">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.broadcast">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.broadcast">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span><span class="n">sender</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Broadcasts a message to all connected and authenticated clients.</span>
@@ -223,7 +223,7 @@
 
 
 <div class="viewcode-block" id="send_private">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_private">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.send_private">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">send_private</span><span class="p">(</span><span class="n">sender</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sends a private message to a single specified client.</span>
@@ -251,7 +251,7 @@
 
 
 <div class="viewcode-block" id="send_system">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.send_system">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.send_system">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">send_system</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sends a system message to a single client.</span>
@@ -265,7 +265,7 @@
 
 
 <div class="viewcode-block" id="remove_client">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.remove_client">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.remove_client">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">remove_client</span><span class="p">(</span><span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Removes a client from the global client and address dictionaries and closes the socket.</span>
@@ -288,7 +288,7 @@
 
 <span class="c1"># ---------------- Per-client handler ----------------</span>
 <div class="viewcode-block" id="handle_client">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.handle_client">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.handle_client">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">handle_client</span><span class="p">(</span><span class="n">conn</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">addr</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles a single client connection from inception to termination.</span>
@@ -385,7 +385,7 @@
 
 <span class="c1"># ---------------- Server main ----------------</span>
 <div class="viewcode-block" id="start_server">
-<a class="viewcode-back" href="../../chatterbox.html#chatterbox.server.start_server">[docs]</a>
+<a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.start_server">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">start_server</span><span class="p">(</span><span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">HOST</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PORT</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Starts the main chat server and listens for incoming connections.</span>
@@ -449,9 +449,9 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">chatterbox 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">chatterflow 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">chatterbox.server</a></li> 
+        <li class="nav-item nav-item-this"><a href="">chatterflow.server</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

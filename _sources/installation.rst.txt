@@ -15,8 +15,8 @@ Steps
 
     .. code-block:: bash
 
-        git clone https://github.com/bhatishan2003/chatterbox.git
-        cd chatterbox
+        git clone https://github.com/bhatishan2003/chatterflow.git
+        cd chatterflow
 
 2.  **Create and activate a virtual environment (recommended):**
 

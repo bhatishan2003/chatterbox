@@ -8,7 +8,7 @@ Open a terminal and run the following command to start the chat server on the de
 
 .. code-block:: bash
 
-    chatterbox --server
+    chatterflow --server
 
 2. Start the Client
 -------------------
@@ -17,7 +17,7 @@ Open one or more new terminals and run the following command to connect a client
 
 .. code-block:: bash
 
-    chatterbox --client
+    chatterflow --client
 
 Commands
 --------
