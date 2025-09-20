@@ -8,6 +8,7 @@ Multi-client chat server with user authentication.
 Users stored in users.json with PBKDF2 password hashing.
 """
 
+import asciigenator
 import chatterflow
 import socket
 import threading
@@ -330,6 +331,7 @@ def start_server(host: str = CHATTERFLOW_SERVER_HOST, port: int = CHATTERFLOW_SE
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
     sock.listen(100)
+    print(asciigenator.generate("CHATTERFLOW", font="block"))
     print(f"Server listening on {host}:{port}")
     try:
         while True:
