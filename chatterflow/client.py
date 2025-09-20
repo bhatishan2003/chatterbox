@@ -11,6 +11,7 @@ Terminal chat client. Supports login/register and commands:
  - /quit                quit
 """
 
+import chatterflow
 import socket
 import struct
 import json
@@ -18,7 +19,6 @@ import threading
 import getpass
 import sys
 from typing import Any
-from .env import CHATTERFLOW_CLIENT_HOST, CHATTERFLOW_CLIENT_PORT
 
 
 # ---------------- Socket helpers ----------------
@@ -133,7 +133,7 @@ def main():
     or executing commands.
     """
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn.connect((CHATTERFLOW_CLIENT_HOST, CHATTERFLOW_CLIENT_PORT))
+    conn.connect((chatterflow.env.CHATTERFLOW_SERVER_HOST, chatterflow.env.CHATTERFLOW_SERVER_PORT))
 
     welcome = recv_json(conn)
     if welcome and welcome.get("type") == "system":
