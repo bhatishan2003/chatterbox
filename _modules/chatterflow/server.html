@@ -44,6 +44,7 @@
 <span class="sd">Users stored in users.json with PBKDF2 password hashing.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">chatterflow</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -52,10 +53,8 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">CHATTERFLOW_SERVER_HOST</span><span class="p">,</span> <span class="n">CHATTERFLOW_SERVER_PORT</span>
 
-<span class="n">HOST</span> <span class="o">=</span> <span class="s2">&quot;127.0.0.1&quot;</span>
-<span class="n">PORT</span> <span class="o">=</span> <span class="mi">9009</span>
-<span class="n">USERS_FILE</span> <span class="o">=</span> <span class="s2">&quot;users.json&quot;</span>
 
 <span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 <span class="n">clients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -74,9 +73,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: A dictionary containing user data, with usernames as keys.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">chatterflow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">CHATTERFLOW_USERS_FILE_PATH</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">chatterflow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">CHATTERFLOW_USERS_FILE_PATH</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
 
 
@@ -90,7 +89,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        users (dict): A dictionary containing user data to be saved.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">USERS_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">chatterflow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">CHATTERFLOW_USERS_FILE_PATH</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 
@@ -386,7 +385,7 @@
 <span class="c1"># ---------------- Server main ----------------</span>
 <div class="viewcode-block" id="start_server">
 <a class="viewcode-back" href="../../chatterflow.html#chatterflow.server.start_server">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">start_server</span><span class="p">(</span><span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">HOST</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">PORT</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">start_server</span><span class="p">(</span><span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">CHATTERFLOW_SERVER_HOST</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">CHATTERFLOW_SERVER_PORT</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Starts the main chat server and listens for incoming connections.</span>
 
