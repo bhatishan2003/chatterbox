@@ -47,6 +47,7 @@
 <span class="sd"> - /quit                quit</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">chatterflow</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -54,7 +55,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">CHATTERFLOW_CLIENT_HOST</span><span class="p">,</span> <span class="n">CHATTERFLOW_CLIENT_PORT</span>
 
 
 <span class="c1"># ---------------- Socket helpers ----------------</span>
@@ -183,7 +183,7 @@
 <span class="sd">    or executing commands.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">conn</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
-    <span class="n">conn</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">CHATTERFLOW_CLIENT_HOST</span><span class="p">,</span> <span class="n">CHATTERFLOW_CLIENT_PORT</span><span class="p">))</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">chatterflow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">CHATTERFLOW_SERVER_HOST</span><span class="p">,</span> <span class="n">chatterflow</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">CHATTERFLOW_SERVER_PORT</span><span class="p">))</span>
 
     <span class="n">welcome</span> <span class="o">=</span> <span class="n">recv_json</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">welcome</span> <span class="ow">and</span> <span class="n">welcome</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;system&quot;</span><span class="p">:</span>
