@@ -170,9 +170,7 @@ def main():
                 parts = line.split(" ", 2)
                 cmd = parts[0].lower()
                 if cmd == "/msg" and len(parts) == 3:
-                    send_json(
-                        conn, {"type": "private", "to": parts[1], "text": parts[2]}
-                    )
+                    send_json(conn, {"type": "private", "to": parts[1], "text": parts[2]})
                 elif cmd == "/list":
                     send_json(conn, {"type": "list"})
                 elif cmd == "/help":

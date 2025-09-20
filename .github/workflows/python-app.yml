@@ -30,4 +30,4 @@ jobs:
           pip install .[test]
       - name: Run tests with coverage
         run: |
-          pytest --cov=chatterbox --cov-report=xml --cov-report=term
+          pytest --cov=chatterflow --cov-report=xml --cov-report=term

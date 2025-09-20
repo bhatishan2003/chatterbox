@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "chatterbox"
+project = "chatterflow"
 copyright = "2025, Ishan Bhat"
 author = "Ishan Bhat"
 release = "0.0.1"

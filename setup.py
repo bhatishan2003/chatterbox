@@ -23,7 +23,7 @@ dev_requires = read_requirements("requirements/requirements_dev.txt")
 docs_requires = read_requirements("requirements/requirements_docs.txt")
 
 setup(
-    name="chatterbox",
+    name="chatterflow",
     version="0.0.1",
     author="Ishan Bhat",
     author_email="ishan2003bhat@gmail.com",
@@ -57,7 +57,7 @@ setup(
     python_requires=">=3.6",
     entry_points={
         "console_scripts": [
-            "chatterbox=chatterbox.cli:main",
+            "chatterflow=chatterflow.cli:main",
         ],
     },
     keywords="A cli based chat application in python",

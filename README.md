@@ -1,9 +1,9 @@
-# Chatterbox
+# chatterflow
 
 ![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
-[![License](https://img.shields.io/github/license/bhatishan2003/chatterbox)](LICENSE)
-[![Python CI](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml/badge.svg)](https://github.com/bhatishan2003/chatterbox/actions/workflows/python-app.yml)
-[![Build and Deploy Sphinx Docs](https://github.com/bhatishan2003/chatterbox/actions/workflows/sphinx.yml/badge.svg)](https://github.com/bhatishan2003/chatterbox/actions/workflows/sphinx.yml)
+[![License](https://img.shields.io/github/license/bhatishan2003/chatterflow)](LICENSE)
+[![Python CI](https://github.com/bhatishan2003/chatterflow/actions/workflows/python-app.yml/badge.svg)](https://github.com/bhatishan2003/chatterflow/actions/workflows/python-app.yml)
+[![Build and Deploy Sphinx Docs](https://github.com/bhatishan2003/chatterflow/actions/workflows/sphinx.yml/badge.svg)](https://github.com/bhatishan2003/chatterflow/actions/workflows/sphinx.yml)
 
 A simple, terminal-based chat application with user authentication and private messaging, built with Python sockets.
 
@@ -29,8 +29,8 @@ These instructions will get you a copy of the project up and running on your loc
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/bhatishan2003/chatterbox.git
-    cd chatterbox
+    git clone https://github.com/bhatishan2003/chatterflow.git
+    cd chatterflow
     ```
 
 2.  **Create and activate a virtual environment (recommended):**
@@ -68,7 +68,7 @@ These instructions will get you a copy of the project up and running on your loc
 Open a terminal and run the following command to start the chat server on the default host (`127.0.0.1`) and port (`9009`):
 
 ```bash
-chatterbox --server
+chatterflow --server
 ```
 
 ### 2. Start the Client
@@ -76,7 +76,7 @@ chatterbox --server
 Open one or more new terminals and run the following command to connect a client to the server:
 
 ```bash
-chatterbox --client
+chatterflow --client
 ```
 
 ## Commands

@@ -1,29 +1,29 @@
-chatterbox package
+chatterflow package
 ==================
 
 Submodules
 ----------
 
-chatterbox.cli module
+chatterflow.cli module
 ---------------------
 
-.. automodule:: chatterbox.cli
+.. automodule:: chatterflow.cli
    :members:
    :show-inheritance:
    :undoc-members:
 
-chatterbox.client module
+chatterflow.client module
 ------------------------
 
-.. automodule:: chatterbox.client
+.. automodule:: chatterflow.client
    :members:
    :show-inheritance:
    :undoc-members:
 
-chatterbox.server module
+chatterflow.server module
 ------------------------
 
-.. automodule:: chatterbox.server
+.. automodule:: chatterflow.server
    :members:
    :show-inheritance:
    :undoc-members:
@@ -31,7 +31,7 @@ chatterbox.server module
 Module contents
 ---------------
 
-.. automodule:: chatterbox
+.. automodule:: chatterflow
    :members:
    :show-inheritance:
    :undoc-members:

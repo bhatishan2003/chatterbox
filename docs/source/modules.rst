@@ -1,7 +1,7 @@
-chatterbox
+chatterflow
 ==========
 
 .. toctree::
    :maxdepth: 4
 
-   chatterbox
+   chatterflow
