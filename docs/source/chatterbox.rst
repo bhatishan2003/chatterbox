@@ -1,11 +1,11 @@
 chatterflow package
-==================
+===================
 
 Submodules
 ----------
 
 chatterflow.cli module
----------------------
+----------------------
 
 .. automodule:: chatterflow.cli
    :members:
@@ -13,7 +13,7 @@ chatterflow.cli module
    :undoc-members:
 
 chatterflow.client module
-------------------------
+-------------------------
 
 .. automodule:: chatterflow.client
    :members:
@@ -21,7 +21,7 @@ chatterflow.client module
    :undoc-members:
 
 chatterflow.server module
-------------------------
+-------------------------
 
 .. automodule:: chatterflow.server
    :members:

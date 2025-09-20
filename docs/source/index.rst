@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to chatterflow's documentation!
-======================================
+=======================================
 
 **chatterflow** is a simple, terminal-based chat application with user authentication and private messaging, built with Python sockets.
 
@@ -27,3 +27,4 @@ Features
    test
    modules
    api
+   chatterbox
