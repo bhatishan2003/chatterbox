@@ -18,9 +18,7 @@ import threading
 import getpass
 import sys
 from typing import Any
-
-HOST = "127.0.0.1"
-PORT = 9009
+from .env import CHATTERFLOW_CLIENT_HOST, CHATTERFLOW_CLIENT_PORT
 
 
 # ---------------- Socket helpers ----------------
@@ -135,7 +133,7 @@ def main():
     or executing commands.
     """
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn.connect((HOST, PORT))
+    conn.connect((CHATTERFLOW_CLIENT_HOST, CHATTERFLOW_CLIENT_PORT))
 
     welcome = recv_json(conn)
     if welcome and welcome.get("type") == "system":

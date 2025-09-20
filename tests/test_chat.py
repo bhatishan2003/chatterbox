@@ -6,7 +6,7 @@ import os
 import tempfile
 from unittest.mock import patch, MagicMock
 from io import StringIO
-
+import chatterflow
 from chatterflow import server, client, cli
 
 
@@ -15,7 +15,7 @@ from chatterflow import server, client, cli
 def temp_users_file(tmp_path_factory):
     """Provide isolated users.json path for tests."""
     temp_file = tmp_path_factory.mktemp("data") / "users.json"
-    server.USERS_FILE = str(temp_file)
+    chatterflow.env.CHATTERFLOW_USERS_FILE_PATH = str(temp_file)
     return temp_file
 
 
@@ -277,8 +277,8 @@ def test_users_file_creation():
     """Test users file creation when it doesn't exist"""
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = os.path.join(temp_dir, "nonexistent_users.json")
-        original_file = server.USERS_FILE
-        server.USERS_FILE = temp_file
+        original_file = chatterflow.env.CHATTERFLOW_USERS_FILE_PATH
+        chatterflow.env.CHATTERFLOW_USERS_FILE_PATH = temp_file
 
         try:
             users = server.load_users()
@@ -292,7 +292,7 @@ def test_users_file_creation():
             loaded = server.load_users()
             assert loaded == test_users
         finally:
-            server.USERS_FILE = original_file
+            chatterflow.env.CHATTERFLOW_USERS_FILE_PATH = original_file
 
 
 # ---------------- CLI tests ----------------

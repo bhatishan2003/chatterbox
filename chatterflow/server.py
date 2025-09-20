@@ -8,6 +8,7 @@ Multi-client chat server with user authentication.
 Users stored in users.json with PBKDF2 password hashing.
 """
 
+import chatterflow
 import socket
 import threading
 import json
@@ -16,10 +17,8 @@ import hashlib
 import secrets
 import struct
 from typing import Dict, Any
+from .env import CHATTERFLOW_SERVER_HOST, CHATTERFLOW_SERVER_PORT
 
-HOST = "127.0.0.1"
-PORT = 9009
-USERS_FILE = "users.json"
 
 lock = threading.Lock()
 clients: Dict[str, socket.socket] = {}
@@ -36,9 +35,9 @@ def load_users() -> Dict:
     Returns:
         dict: A dictionary containing user data, with usernames as keys.
     """
-    if not os.path.exists(USERS_FILE):
+    if not os.path.exists(chatterflow.env.CHATTERFLOW_USERS_FILE_PATH):
         return {}
-    with open(USERS_FILE, "r") as f:
+    with open(chatterflow.env.CHATTERFLOW_USERS_FILE_PATH, "r") as f:
         return json.load(f)
 
 
@@ -49,7 +48,7 @@ def save_users(users: Dict):
     Args:
         users (dict): A dictionary containing user data to be saved.
     """
-    with open(USERS_FILE, "w") as f:
+    with open(chatterflow.env.CHATTERFLOW_USERS_FILE_PATH, "w") as f:
         json.dump(users, f, indent=2)
 
 
@@ -315,7 +314,7 @@ def handle_client(conn: socket.socket, addr: tuple):
 
 
 # ---------------- Server main ----------------
-def start_server(host: str = HOST, port: int = PORT):
+def start_server(host: str = CHATTERFLOW_SERVER_HOST, port: int = CHATTERFLOW_SERVER_PORT):
     """
     Starts the main chat server and listens for incoming connections.
 
