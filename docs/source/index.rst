@@ -27,4 +27,4 @@ Features
    test
    modules
    api
-   chatterbox
+   chatterflow

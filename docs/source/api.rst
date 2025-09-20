@@ -1,8 +1,8 @@
 API Reference
 =============
 
-This section provides the API documentation for **weathora**.
-It includes the main ASCII art generation functionality.
+This section provides the API documentation for **chatterflow**.
+It includes the main code functionality.
 
 .. toctree::
    :maxdepth: 2
