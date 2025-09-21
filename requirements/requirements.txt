@@ -1,2 +1,2 @@
 asciigenator
-playsound3
+playsound
