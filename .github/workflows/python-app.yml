@@ -29,9 +29,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install playsound
           pip install build
           pip install .[test]
+          pip install playsound
 
       - name: Run tests with coverage
         run: |

@@ -18,8 +18,15 @@ import json
 import threading
 import getpass
 from typing import Any
-from playsound import playsound
 import os
+
+# ---------------- Optional playsound import ----------------
+try:
+    from playsound import playsound
+except ImportError:
+    # Dummy function to prevent CI break
+    def playsound(*args, **kwargs):
+        print("[INFO] playsound not installed. Skipping audio playback.")
 
 
 # ---------------- Socket helpers ----------------
