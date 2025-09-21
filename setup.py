@@ -25,7 +25,7 @@ docs_requires = read_requirements("requirements/requirements_docs.txt")
 
 setup(
     name="chatterflow",
-    version="0.0.7",
+    version="0.0.8",
     author="Ishan Bhat",
     author_email="ishan2003bhat@gmail.com",
     description="A cli based chat application in python",
