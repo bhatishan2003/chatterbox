@@ -9,12 +9,12 @@ A simple, terminal-based chat application with user authentication and private m
 
 ## Features
 
-- **User Authentication:** Secure registration and login system.
-- **Password Hashing:** Passwords are securely hashed using PBKDF2.
-- **Public Chat:** Broadcast messages to all connected users.
-- **Private Messaging:** Send private messages to specific users.
-- **User List:** View a list of all online users.
-- **Multi-client Support:** The server uses threading to handle multiple clients concurrently.
+-   **User Authentication:** Secure registration and login system.
+-   **Password Hashing:** Passwords are securely hashed using PBKDF2.
+-   **Public Chat:** Broadcast messages to all connected users.
+-   **Private Messaging:** Send private messages to specific users.
+-   **User List:** View a list of all online users.
+-   **Multi-client Support:** The server uses threading to handle multiple clients concurrently.
 
 ## Getting Started
 
@@ -22,44 +22,51 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- Python 3.11 or higher
+-   Python 3.11 or higher
 
 ### Installation
 
-1.  **Clone the repository:**
+1.  **From pypi:**
+
+
+    ```bash
+    pip install chatterflow
+    ```
+
+2.  **Clone the repository:**
 
     ```bash
     git clone https://github.com/bhatishan2003/chatterflow.git
     cd chatterflow
     ```
 
-2.  **Create and activate a virtual environment (recommended):**
+3.  **Create and activate a virtual environment (recommended):**
 
-    - **Windows:**
+    -   **Windows:**
 
-      ```bash
-      python -m venv .venv
-      .venv\Scripts\activate
-      ```
+        ```bash
+        python -m venv .venv
+        .venv\Scripts\activate
+        ```
 
-    - **macOS & Linux:**
-      ```bash
-      python -m venv .venv
-      source .venv/bin/activate
-      ```
+    -   **macOS & Linux:**
+        ```bash
+        python -m venv .venv
+        source .venv/bin/activate
+        ```
 
-3.  **Install the package:**
+4.  **Install the package:**
 
-    - For regular use:
+    -   For regular use:
 
-      ```bash
-      pip install .
-      ```
+        ```bash
+        pip install .
+        ```
 
-    - For development (editable mode):
-      ```bash
-      pip install -e .
-      ```
+    -   For development (editable mode):
+        ```bash
+        pip install -e .
+        ```
 
 ## Usage
 
