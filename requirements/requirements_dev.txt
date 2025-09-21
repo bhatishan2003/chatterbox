@@ -1,4 +1,5 @@
 build
+bump-my-version
 pre-commit
 ruff
 twine
