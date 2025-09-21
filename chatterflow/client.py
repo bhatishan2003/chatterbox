@@ -18,15 +18,6 @@ import json
 import threading
 import getpass
 from typing import Any
-import os
-
-# ---------------- Optional playsound import ----------------
-try:
-    from playsound import playsound
-except ImportError:
-    # Dummy function to prevent CI break
-    def playsound(*args, **kwargs):
-        print("[INFO] playsound not installed. Skipping audio playback.")
 
 
 # ---------------- Socket helpers ----------------
@@ -98,7 +89,6 @@ def receiver_thread(conn: socket.socket):
     Args:
         conn (socket.socket): The client's socket connection to the server.
     """
-    sound_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "sound.wav"))
     try:
         while True:
             msg = recv_json(conn)
@@ -109,10 +99,8 @@ def receiver_thread(conn: socket.socket):
             if typ == "system":
                 print(f"[SYSTEM] {msg.get('text')}")
             elif typ == "broadcast":
-                playsound(sound_file)
                 print(f"[{msg.get('from')}] {msg.get('text')}")
             elif typ == "private":
-                playsound(sound_file)
                 print(f"[PRIVATE from {msg.get('from')}] {msg.get('text')}")
             elif typ == "list":
                 print("[USERS] " + ", ".join(msg.get("users", [])))
