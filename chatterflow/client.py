@@ -17,8 +17,8 @@ import struct
 import json
 import threading
 import getpass
-import sys
 from typing import Any
+import winsound
 
 
 # ---------------- Socket helpers ----------------
@@ -100,8 +100,10 @@ def receiver_thread(conn: socket.socket):
             if typ == "system":
                 print(f"[SYSTEM] {msg.get('text')}")
             elif typ == "broadcast":
+                winsound.MessageBeep()
                 print(f"[{msg.get('from')}] {msg.get('text')}")
             elif typ == "private":
+                winsound.MessageBeep()
                 print(f"[PRIVATE from {msg.get('from')}] {msg.get('text')}")
             elif typ == "list":
                 print("[USERS] " + ", ".join(msg.get("users", [])))
@@ -109,7 +111,6 @@ def receiver_thread(conn: socket.socket):
                 print("[UNKNOWN]", msg)
     finally:
         conn.close()
-        sys.exit(0)
 
 
 # ---------------- Helpers ----------------
@@ -144,7 +145,7 @@ def main():
         if choice in ("l", "r"):
             break
     action = "login" if choice == "l" else "register"
-    username = input("username: ").strip()
+    username = input("username: ".strip())
     password = getpass.getpass("password: ")
 
     send_json(conn, {"action": action, "username": username, "password": password})
@@ -161,6 +162,9 @@ def main():
     print("Type /help for commands. Start chatting!")
     try:
         while True:
+            if not t.is_alive():
+                print("Connection lost. Exiting...")
+                break
             line = input()
             if not line:
                 continue
