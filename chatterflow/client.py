@@ -18,7 +18,8 @@ import json
 import threading
 import getpass
 from typing import Any
-import winsound
+from playsound import playsound
+import os
 
 
 # ---------------- Socket helpers ----------------
@@ -90,6 +91,7 @@ def receiver_thread(conn: socket.socket):
     Args:
         conn (socket.socket): The client's socket connection to the server.
     """
+    sound_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "sound.wav"))
     try:
         while True:
             msg = recv_json(conn)
@@ -100,10 +102,10 @@ def receiver_thread(conn: socket.socket):
             if typ == "system":
                 print(f"[SYSTEM] {msg.get('text')}")
             elif typ == "broadcast":
-                winsound.MessageBeep()
+                playsound(sound_file)
                 print(f"[{msg.get('from')}] {msg.get('text')}")
             elif typ == "private":
-                winsound.MessageBeep()
+                playsound(sound_file)
                 print(f"[PRIVATE from {msg.get('from')}] {msg.get('text')}")
             elif typ == "list":
                 print("[USERS] " + ", ".join(msg.get("users", [])))
@@ -145,7 +147,7 @@ def main():
         if choice in ("l", "r"):
             break
     action = "login" if choice == "l" else "register"
-    username = input("username: ".strip())
+    username = input("username: ").strip()
     password = getpass.getpass("password: ")
 
     send_json(conn, {"action": action, "username": username, "password": password})

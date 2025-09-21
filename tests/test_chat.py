@@ -467,7 +467,7 @@ def test_receiver_thread_message_types():
     sender = threading.Thread(target=send_messages)
     sender.start()
 
-    with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
+    with patch("sys.stdout", new_callable=StringIO) as mock_stdout, patch("chatterflow.client.playsound") as mock_playsound:
         with patch("sys.exit"):
             client.receiver_thread(s2)
 
@@ -477,6 +477,7 @@ def test_receiver_thread_message_types():
     assert "[PRIVATE from bob]" in output
     assert "[USERS]" in output
     assert "[UNKNOWN]" in output
+    assert mock_playsound.call_count == 2
 
     sender.join()
     s2.close()
